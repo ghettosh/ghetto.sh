@@ -274,7 +274,7 @@ wait_for_ssh(){
 send_openvpn_scripts(){
   local rc=
   local sent=0
-  local publicipaddress="$(cat ${output_file}.publicipaddress)"
+  local publicipaddress="${publicipaddress:-$(cat ${output_file}.publicipaddress)}"
 
   local ssh_opts=" -i ${keyfile} "
   ssh_opts+=" -o ConnectTimeout=5 "
@@ -411,6 +411,8 @@ elif [[ "${1}" == "-b" || ${1} == "--build" ]]; then
 elif grep "${1}" /etc/hosts >/dev/null 2>&1 ; then
   export target="${1}"
   export publicipaddress="$(awk '$2 ~ /'${1}'/{print $1}' /etc/hosts)"
+  export keyfile="keys/${target}/${target}"
+  send_openvpn_scripts
   create_client_config
 else
   echo
